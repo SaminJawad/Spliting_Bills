@@ -2,7 +2,7 @@
 
 A beautiful, **dark-themed**, fast, fully **offline-capable** Progressive Web App to split restaurant & travel bills with friends. No currency selector, no sign-up, no internet required after the first load.
 
-**🌐 Live Demo:** `Deploy to Netlify (see DEPLOYMENT_GUIDE.md)`
+**🌐 Live Demo:** `(https://splitingbills.netlify.app/)`
 
 ---
 
