@@ -9,8 +9,8 @@
 ══════════════════════════════════════ */
 const state = {
   members: [],          // { id, name }
-  tipPct: 10,
-  method: 'equal',      // equal | percentage | custom | items
+  tipAmount: 0,
+  method: 'equal',      // equal | items
   items: [],            // { id, name, price, assignees: [memberId] }
   payerMode: 'even',    // even | single | multi
   singlePayer: null,    // memberId
@@ -27,12 +27,6 @@ const AVATAR_COLORS = [
   '#6C63FF', '#FF6584', '#10B981', '#F59E0B', '#EF4444',
   '#3B82F6', '#8B5CF6', '#EC4899', '#14B8A6', '#F97316',
   '#06B6D4', '#84CC16', '#D946EF', '#A855F7'
-];
-
-const DEFAULT_NAMES = [
-  'Alice','Bob','Carol','Dave','Eve','Frank','Grace','Heidi',
-  'Ivan','Judy','Kevin','Linda','Mike','Nina','Oscar','Paula',
-  'Quinn','Ruth','Sam','Tina','Uma','Victor','Wendy','Xavier','Yara','Zack'
 ];
 
 /* ══════════════════════════════════════
@@ -95,9 +89,9 @@ $$('.nav-btn').forEach(btn => {
 function calcBill() {
   const sub = parseFloat($('total-amount').value) || 0;
   const taxPct = parseFloat($('tax-pct').value) || 0;
-  const tipPct = state.tipPct || 0;
+  const tipAmount = state.tipAmount || 0;
   const tax = sub * taxPct / 100;
-  const tip = sub * tipPct / 100;
+  const tip = tipAmount;
   const total = sub + tax + tip;
   return { sub, tax, tip, total };
 }
@@ -116,25 +110,9 @@ function updateBillSummary() {
 $('total-amount').addEventListener('input', updateBillSummary);
 $('tax-pct').addEventListener('input', updateBillSummary);
 
-/* Tip pills */
-$('tip-pills').querySelectorAll('.pill').forEach(p => {
-  p.addEventListener('click', () => {
-    $('tip-pills').querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
-    p.classList.add('active');
-    const val = p.dataset.tip;
-    if (val === 'custom') {
-      $('tip-custom').classList.remove('hidden');
-      $('tip-custom').focus();
-      state.tipPct = parseFloat($('tip-custom').value) || 0;
-    } else {
-      $('tip-custom').classList.add('hidden');
-      state.tipPct = parseFloat(val);
-    }
-    updateBillSummary();
-  });
-});
+/* Tip amount */
 $('tip-custom').addEventListener('input', e => {
-  state.tipPct = parseFloat(e.target.value) || 0;
+  state.tipAmount = parseFloat(e.target.value) || 0;
   updateBillSummary();
 });
 
@@ -192,33 +170,6 @@ $('new-member-name').addEventListener('keydown', e => {
   if (e.key === 'Enter') { e.preventDefault(); addMember(e.target.value); }
 });
 
-/* Preset counts */
-$$('.preset-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    if (btn.id === 'preset-custom') {
-      const n = parseInt(prompt('How many people?', '8'), 10);
-      if (!n || n < 1 || n > 100) { toast('Enter 1-100', 'error'); return; }
-      applyPreset(n);
-    } else {
-      applyPreset(parseInt(btn.dataset.count, 10));
-    }
-  });
-});
-
-function applyPreset(count) {
-  if (state.members.length > 0) {
-    if (!confirm(`Replace current ${state.members.length} member(s) with ${count} auto-named people?`)) return;
-  }
-  state.members = [];
-  for (let i = 0; i < count; i++) {
-    const base = DEFAULT_NAMES[i % DEFAULT_NAMES.length];
-    const name = i < DEFAULT_NAMES.length ? base : `${base} ${Math.floor(i / DEFAULT_NAMES.length) + 1}`;
-    state.members.push({ id: uid(), name });
-  }
-  renderMembers();
-  toast(`Added ${count} members`, 'success');
-}
-
 /* ══════════════════════════════════════
    METHOD SELECTOR
 ══════════════════════════════════════ */
@@ -234,89 +185,7 @@ $$('.method-card').forEach(card => {
 });
 
 function renderMethodPanel() {
-  if (state.method === 'percentage') renderPercentagePanel();
-  else if (state.method === 'custom') renderCustomPanel();
-  else if (state.method === 'items') renderItems();
-}
-
-/* ── Percentage ── */
-function renderPercentagePanel() {
-  const ul = $('pct-list');
-  if (state.members.length === 0) {
-    ul.innerHTML = `<li class="members-list__empty">Add members first</li>`;
-    $('pct-total-display').textContent = '0%';
-    return;
-  }
-  const evenly = round2(100 / state.members.length);
-  ul.innerHTML = state.members.map((m, i) => {
-    const cur = m._pct != null ? m._pct : evenly;
-    return `
-      <li class="adjust-item">
-        <span class="member-avatar" style="background:${getAvatarColor(i)}">${initials(m.name)}</span>
-        <span class="adjust-item__name">${escapeHtml(m.name)}</span>
-        <div class="adjust-item__input-wrap">
-          <input type="number" class="adjust-item__input" data-id="${m.id}"
-                 value="${cur}" min="0" max="100" step="0.1" inputmode="decimal" />
-          <span class="adjust-item__suffix">%</span>
-        </div>
-      </li>`;
-  }).join('');
-  ul.querySelectorAll('.adjust-item__input').forEach(inp => {
-    inp.addEventListener('input', e => {
-      const m = state.members.find(x => x.id === inp.dataset.id);
-      if (m) m._pct = parseFloat(e.target.value) || 0;
-      updatePctTotal();
-    });
-  });
-  // ensure defaults are stored
-  state.members.forEach(m => { if (m._pct == null) m._pct = evenly; });
-  updatePctTotal();
-}
-function updatePctTotal() {
-  const total = state.members.reduce((s, m) => s + (parseFloat(m._pct) || 0), 0);
-  const el = $('pct-total-display');
-  el.textContent = total.toFixed(1) + '%';
-  el.classList.toggle('pct-total--good', Math.abs(total - 100) < 0.05);
-  el.classList.toggle('pct-total--bad', Math.abs(total - 100) >= 0.05);
-}
-
-/* ── Custom amount ── */
-function renderCustomPanel() {
-  const ul = $('custom-list');
-  if (state.members.length === 0) {
-    ul.innerHTML = `<li class="members-list__empty">Add members first</li>`;
-    $('custom-remaining').textContent = '–';
-    return;
-  }
-  ul.innerHTML = state.members.map((m, i) => {
-    const cur = m._custom != null ? m._custom : '';
-    return `
-      <li class="adjust-item">
-        <span class="member-avatar" style="background:${getAvatarColor(i)}">${initials(m.name)}</span>
-        <span class="adjust-item__name">${escapeHtml(m.name)}</span>
-        <div class="adjust-item__input-wrap">
-          <input type="number" class="adjust-item__input" data-id="${m.id}"
-                 value="${cur}" min="0" step="0.01" inputmode="decimal" placeholder="0.00" />
-        </div>
-      </li>`;
-  }).join('');
-  ul.querySelectorAll('.adjust-item__input').forEach(inp => {
-    inp.addEventListener('input', e => {
-      const m = state.members.find(x => x.id === inp.dataset.id);
-      if (m) m._custom = parseFloat(e.target.value) || 0;
-      updateCustomRemaining();
-    });
-  });
-  updateCustomRemaining();
-}
-function updateCustomRemaining() {
-  const b = calcBill();
-  const sum = state.members.reduce((s, m) => s + (parseFloat(m._custom) || 0), 0);
-  const rem = round2(b.total - sum);
-  const el = $('custom-remaining');
-  el.textContent = fmt(rem);
-  el.classList.toggle('pct-total--good', Math.abs(rem) < 0.005);
-  el.classList.toggle('pct-total--bad', Math.abs(rem) >= 0.005);
+  if (state.method === 'items') renderItems();
 }
 
 /* ── Items ── */
@@ -492,20 +361,6 @@ function calculateSplit() {
   if (state.method === 'equal') {
     const each = b.total / state.members.length;
     state.members.forEach(m => { shares[m.id] = each; });
-  }
-  else if (state.method === 'percentage') {
-    const total = state.members.reduce((s, m) => s + (parseFloat(m._pct) || 0), 0);
-    if (Math.abs(total - 100) >= 0.05) {
-      toast(`Percentages must total 100% (currently ${total.toFixed(1)}%)`, 'error'); return;
-    }
-    state.members.forEach(m => { shares[m.id] = b.total * (parseFloat(m._pct) || 0) / 100; });
-  }
-  else if (state.method === 'custom') {
-    const sum = state.members.reduce((s, m) => s + (parseFloat(m._custom) || 0), 0);
-    if (Math.abs(sum - b.total) >= 0.01) {
-      toast(`Custom amounts must total ${fmt(b.total)} (currently ${fmt(sum)})`, 'error'); return;
-    }
-    state.members.forEach(m => { shares[m.id] = parseFloat(m._custom) || 0; });
   }
   else if (state.method === 'items') {
     if (state.items.length === 0) { toast('Add items first', 'error'); return; }
@@ -734,15 +589,12 @@ function resetAll() {
   state.items = [];
   state.singlePayer = null;
   state.multiPayers = {};
-  state.members.forEach(m => { delete m._pct; delete m._custom; });
   state.results = null;
   $('bill-name').value = '';
   $('total-amount').value = '';
   $('tax-pct').value = '';
   $('tip-custom').value = '';
-  $('tip-pills').querySelectorAll('.pill').forEach(p => p.classList.toggle('active', p.dataset.tip === '10'));
-  $('tip-custom').classList.add('hidden');
-  state.tipPct = 10;
+  state.tipAmount = 0;
 
   // reset method
   state.method = 'equal';
@@ -826,6 +678,28 @@ $('clear-history-btn').addEventListener('click', () => {
   persistHistory();
   renderHistory();
   toast('History cleared', 'success');
+});
+
+/* ══════════════════════════════════════
+   HELP MODAL
+══════════════════════════════════════ */
+function openHelpModal() {
+  $('help-modal').classList.remove('hidden');
+  document.body.classList.add('modal-open');
+}
+
+function closeHelpModal() {
+  $('help-modal').classList.add('hidden');
+  document.body.classList.remove('modal-open');
+}
+
+$('help-btn').addEventListener('click', openHelpModal);
+$('help-close').addEventListener('click', closeHelpModal);
+$('help-modal').addEventListener('click', e => {
+  if (e.target === $('help-modal')) closeHelpModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && !$('help-modal').classList.contains('hidden')) closeHelpModal();
 });
 
 /* ══════════════════════════════════════
