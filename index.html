@@ -40,16 +40,37 @@
         <span class="logo__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="12" y1="13" x2="8" y2="13"></line><line x1="12" y1="17" x2="8" y2="17"></line></svg></span>
         <span class="logo__text">BillSplit</span>
       </div>
-      <nav class="header-nav">
-        <button class="nav-btn active" data-tab="split" aria-label="Split tab">
-          <span class="nav-btn__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M20 4l-8.5 8.5M20 20l-8.5-8.5"></path></svg></span><span>Split</span>
-        </button>
-        <button class="nav-btn" data-tab="history" aria-label="History tab">
-          <span class="nav-btn__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span><span>History</span>
-        </button>
-      </nav>
+      <div class="header-actions">
+        <button id="help-btn" class="help-btn" type="button" aria-label="Open step-by-step instructions" title="How to use BillSplit">?</button>
+        <nav class="header-nav">
+          <button class="nav-btn active" data-tab="split" aria-label="Split tab">
+            <span class="nav-btn__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M20 4l-8.5 8.5M20 20l-8.5-8.5"></path></svg></span><span>Split</span>
+          </button>
+          <button class="nav-btn" data-tab="history" aria-label="History tab">
+            <span class="nav-btn__icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span><span>History</span>
+          </button>
+        </nav>
+      </div>
     </div>
   </header>
+
+    <div id="help-modal" class="help-modal hidden" aria-hidden="true">
+    <div class="help-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <div class="help-modal__header">
+        <h2 id="help-title" class="help-modal__title">How to use BillSplit</h2>
+        <button id="help-close" class="help-modal__close" type="button" aria-label="Close instructions">✕</button>
+      </div>
+      <div class="help-modal__body">
+        <ol class="help-steps">
+          <li><strong>Enter bill details</strong><span>Add an optional label, the total bill amount, tax percentage, and a tip amount.</span></li>
+          <li><strong>Add members</strong><span>Type each person's name and tap the + button to build the group.</span></li>
+          <li><strong>Choose a split method</strong><span>Use <em>Equal Split</em> to divide the grand total evenly, or <em>Item-based</em> to assign item prices to specific people.</span></li>
+          <li><strong>Select who paid</strong><span>Choose whether everyone paid their own share, one person paid everything, or multiple people contributed upfront.</span></li>
+          <li><strong>Calculate and review</strong><span>Tap <em>Calculate Split</em> to see each person's share and any settlement amounts, then save it to history if needed.</span></li>
+        </ol>
+      </div>
+    </div>
+  </div>
 
   <!-- ── MAIN CONTENT ── -->
   <main class="app-main">
@@ -68,7 +89,7 @@
           <div class="form-group">
             <label for="bill-name" class="form-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; display: inline; margin-right: 4px;"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>Occasion / Label</label>
             <input id="bill-name" type="text" class="form-input"
-                   placeholder="e.g. Dinner, Goa Trip…" maxlength="60" />
+                   placeholder="Dinner with friends" maxlength="60" />
           </div>
 
           <div class="form-group">
@@ -85,18 +106,10 @@
             </div>
 
             <div class="form-group">
-              <label class="form-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; display: inline; margin-right: 4px;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>Tip %</label>
+              <label for="tip-custom" class="form-label"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; display: inline; margin-right: 4px;"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7H15a3.5 3.5 0 0 1 0 7H6"></path></svg>Tip Amount</label>
               <div class="tip-row">
-                <div class="tip-pills" id="tip-pills">
-                  <button type="button" class="pill" data-tip="0">0</button>
-                  <button type="button" class="pill" data-tip="5">5</button>
-                  <button type="button" class="pill active" data-tip="10">10</button>
-                  <button type="button" class="pill" data-tip="15">15</button>
-                  <button type="button" class="pill" data-tip="20">20</button>
-                  <button type="button" class="pill" data-tip="custom"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></button>
-                </div>
-                <input id="tip-custom" type="number" class="form-input tip-custom hidden"
-                       placeholder="Custom %" min="0" max="200" step="0.1" inputmode="decimal" />
+                <input id="tip-custom" type="number" class="form-input tip-custom"
+                       placeholder="0.00" min="0" step="0.01" inputmode="decimal" />
               </div>
             </div>
           </div>
@@ -124,23 +137,10 @@
         <div class="card__body">
           <div class="add-member-row">
             <input id="new-member-name" type="text" class="form-input"
-                   placeholder="Add name (e.g. Alice)" maxlength="30" />
+                   placeholder="Add member name" maxlength="30" />
             <button id="add-member-btn" class="btn btn--icon btn--primary" aria-label="Add member"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg></button>
           </div>
-
-          <!-- Quick-add preset counts -->
-          <div class="preset-groups">
-            <button type="button" class="preset-btn" data-count="2">2 People</button>
-            <button type="button" class="preset-btn" data-count="3">3 People</button>
-            <button type="button" class="preset-btn" data-count="4">4 People</button>
-            <button type="button" class="preset-btn" data-count="5">5 People</button>
-            <button type="button" class="preset-btn" data-count="6">6 People</button>
-            <button type="button" class="preset-btn" data-count="8">8 People</button>
-            <button type="button" class="preset-btn" data-count="10">10 People</button>
-            <button type="button" class="preset-btn" id="preset-custom">N People…</button>
-          </div>
-
-          <p class="hint-text"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; display: inline; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>Unlimited members supported. Use presets above or type custom names.</p>
+          <p class="hint-text"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; display: inline; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>Add each person manually so the split matches your group exactly.</p>
 
           <ul class="members-list" id="members-list">
             <li class="members-list__empty">No members yet — add people above</li>
@@ -156,21 +156,11 @@
         </header>
 
         <div class="card__body">
-          <div class="method-grid">
+          <div class="method-grid method-grid--compact">
             <button type="button" class="method-card active" data-method="equal">
               <span class="method-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="9" x2="19" y2="9"></line><line x1="5" y1="15" x2="19" y2="15"></line></svg></span>
               <span class="method-card__label">Equal Split</span>
               <span class="method-card__desc">Everyone pays the same</span>
-            </button>
-            <button type="button" class="method-card" data-method="percentage">
-              <span class="method-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"></circle><path d="M18 18a3 3 0 1 0-4.243-4.243"></path><line x1="18" y1="6" x2="6" y2="18"></line></svg></span>
-              <span class="method-card__label">By Percentage</span>
-              <span class="method-card__desc">% per person</span>
-            </button>
-            <button type="button" class="method-card" data-method="custom">
-              <span class="method-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"></rect><line x1="12" y1="9" x2="12" y2="15"></line><line x1="8" y1="11" x2="8" y2="13"></line><line x1="16" y1="11" x2="16" y2="13"></line></svg></span>
-              <span class="method-card__label">Custom Amount</span>
-              <span class="method-card__desc">Exact amount per person</span>
             </button>
             <button type="button" class="method-card" data-method="items">
               <span class="method-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg></span>
@@ -178,24 +168,9 @@
               <span class="method-card__desc">Assign items</span>
             </button>
           </div>
-
           <!-- Equal Split panel -->
           <div id="panel-equal" class="method-panel active">
             <p class="method-hint"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; display: inline; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>Grand total split equally among all members.</p>
-          </div>
-
-          <!-- Percentage panel -->
-          <div id="panel-percentage" class="method-panel hidden">
-            <p class="method-hint"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; display: inline; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>Assign a % per person. Total must equal 100%.</p>
-            <ul class="adjust-list" id="pct-list"></ul>
-            <div class="pct-total-row"><span>Total:</span><span id="pct-total-display" class="pct-total">0%</span></div>
-          </div>
-
-          <!-- Custom Amount panel -->
-          <div id="panel-custom" class="method-panel hidden">
-            <p class="method-hint"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: -2px; display: inline; margin-right: 4px;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>Enter exact amounts per person.</p>
-            <ul class="adjust-list" id="custom-list"></ul>
-            <div class="pct-total-row"><span>Remaining:</span><span id="custom-remaining" class="pct-total">–</span></div>
           </div>
 
           <!-- Item-based panel -->
