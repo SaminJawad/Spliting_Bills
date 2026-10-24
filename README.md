@@ -75,7 +75,7 @@ billsplit-v2/
 ---
 
 
-## 🔐 Privacy
+## Privacy
 
 - 100% client-side. No analytics, no sign-in, no tracking.
 - History & preferences stored only in your browser's `localStorage`.
