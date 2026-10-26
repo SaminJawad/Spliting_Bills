@@ -9,16 +9,16 @@ A beautiful, **dark-themed**, fast, fully **offline-capable** Progressive Web Ap
 ## Features
 
 ### Bill Details
-- **Occasion / label** (e.g. "Goa Trip", "Dinner")
-- **Total bill amount** (currency-agnostic — just numbers)
+- **Occasion / label** (e.g. "Trip", "Dinner")
+- **Total bill amount**
 - **Tax %** with live calculation
 - **Tip presets**: 0 / 5 / 10 / 15 / 20 or custom %
 - **Live summary**: Subtotal → Tax → Tip → Grand Total
 
-### Members (Unlimited!)
+### Members
 - Add members one-by-one, OR
 - Quick presets: 2 / 3 / 4 / 5 / 6 / 8 / 10 people, OR
-- **"N People…"** for any custom count (up to 100)
+- **"N People…"** for any custom count
 - Colourful avatar initials per member
 
 ### Split Methods
@@ -29,7 +29,7 @@ A beautiful, **dark-themed**, fast, fully **offline-capable** Progressive Web Ap
 | **Custom Amount** | Enter exact amounts per person |
 | **Item-Based** | Add items & assign them to one or more people |
 
-### Who Paid? (NEW!)
+### Who Paid?
 A key feature for real-world scenarios:
 
 - **Everyone Paid Own Share** — no settlement needed
